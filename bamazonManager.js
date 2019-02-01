@@ -18,6 +18,7 @@ connection.connect(function (err) {
 
 //views products from database
 function viewProductsForSale(){
+
     console.log("Displaying all products...\n");
     connection.query("SELECT * FROM products", function (err, res) {
         if (err) throw err;
@@ -25,10 +26,10 @@ function viewProductsForSale(){
         res.forEach(element => {
            var products = [
                 'Product Id: '      +  `${element.item_id}`,
-                'Product Name: '    +  `${element.product_name}`,
+                'Product Name: '    + `${element.product_name}`,
                 'Department Name: ' + `${element.department_name}`,
                 'Price:'            + `${element.price}`,
-                'Stock Quantity: '  +`${element.stock_quantity}`
+                'Stock Quantity: '  + `${element.stock_quantity}`
             ].join("\n");
            console.log(products + "\n");  
         });
@@ -46,11 +47,11 @@ function viewLowInventory(){
         if(err) throw err;  
         res.forEach(element => {
             var products = [
-                 'Product Id: '      +  `${element.item_id}`,
-                 'Product Name: '    +  `${element.product_name}`,
+                 'Product Id: '      + `${element.item_id}`,
+                 'Product Name: '    + `${element.product_name}`,
                  'Department Name: ' + `${element.department_name}`,
                  'Price:'            + `${element.price}`,
-                 'Stock Quantity: '  +`${element.stock_quantity}`
+                 'Stock Quantity: '  + `${element.stock_quantity}`
              ].join("\n");
             console.log(products + "\n");  
          });
@@ -59,28 +60,14 @@ function viewLowInventory(){
 }
 
 // add more to the inventory that is selected
-function addToInventory(amount, id) {
+function addToInventory(amount, stockQuantity, id) {
     // console.log(" Add more amount to the inventory.");
-    connection.query("SELECT * FROM products WHERE item_id = ? ", [id], function (err, res) {
-        if (err) throw err;
-        //console.log(res);
-        console.log(res.stock_quantity);
-        var updateSotck = parseInt(res.stock_quantity) + amount;
-        console.log(amount);
-        console.log(typeof updateSotck);
-        console.log(`${updateSotck} amount has been added.` );
-            var products = [
-                'Product Id: '      + `${res.item_id}`,
-                'Product Name: '    + `${res.product_name}`,
-                'Department Name: ' + `${res.department_name}`,
-                'Price:'            + `${res.price}`,
-                'Stock Quantity: '  + `${res.stock_quantity + amount}`
-            ].join("\n");
-
-            // console.log(products + "\n");
-        
-        managerPrompt();
-    });
+    connection.query("UPDATE  products SET stock_quantity = ? WHERE item_id = ? ", [stockQuantity + amount, id], 
+           function (err, res) {
+                if (err) throw err;
+                console.log("");
+                managerPrompt();
+            });
 }
 
 
@@ -96,16 +83,8 @@ function addNewProduct(product_name, department_name, price, stock_quantity){
   
     connection.query(sql, [product_name, department_name, price, stock_quantity], function (err, res) {
             if (err) throw err;
-            var newProduct = [
-                'Product Id: '      + `${res.item_id}`,
-                'Product Name: '    + `${res.product_name}`,
-                'Department Name: ' + `${res.department_name}`,
-                'Price:'            + `${res.price}`,
-                'Stock Quantity: '  + `${res.stock_quantity}`
-            ].join("\n");
-
-            console.log(newProduct + "\n");
-            console.log(res);
+                 
+            console.log(" ");
             managerPrompt();
         });
     ;    
@@ -122,24 +101,31 @@ function addToInventoryPrompt(){
                 type: "input",
                 message: "Select a product.",
                 name: "id"
-            } ,      
+            } ,  
             {
                 type: "input",
-                message: "How many would you like to add to your inventory? ",
+                message: "Enter the current stock quantity.",
+                name: "stockQuantity"
+            },    
+            {
+                type: "input",
+                message: "How much would you like to add to your inventory? ",
                 name: "amount"
-            }
+            },
+           
         ])
         .then(answers => {
                 var id = Number(answers.id);
+                var stockQuantity = Number(answers.stockQuantity);
                 var amount = Number(answers.amount);
-                if ((!(id > 0))&&(typeof amount !== 'number' || amount < 1)) {
+                if ((!(id > 0))&&(typeof amount !== 'number' || amount < 1)&&(stockQuantity>0)) {
                     // if user enters a non-number or negative number, notify them and reprompt
                     console.log('Invalid entry. Please enter a number greater than 0.');
                     addToInventoryPrompt();
                 }
                 else {
                     console.log("Updated product amount.")
-                    addToInventory(amount, id);
+                    addToInventory(amount,stockQuantity, id);
                 }
             ;
         });
@@ -173,6 +159,7 @@ function addNewProductPrompt(){
         ])
         .then(answers => {
              addNewProduct(answers.product_name, answers.department_name, answers.price, answers.stock_quantity);
+             console.log("New item has been added.");
         });
     ;
 }

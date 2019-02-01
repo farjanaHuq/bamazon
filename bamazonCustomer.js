@@ -1,6 +1,9 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
 
+const EventEmitter = require('eventemitter3')
+const emitter = new EventEmitter();
+
 var connection = mysql.createConnection({
     host: "localhost",
     port: 3306,
@@ -21,19 +24,30 @@ function readProducts() {
         if (err) 
         throw err;
         // Log all results of the SELECT statement
-        console.log(res);
-        // prompt user for product ID
-        idPrompt(res);  
+        res.forEach(element => {
+            var products = [
+                 'Product Id: '      + `${element.item_id}`,
+                 'Product Name: '    + `${element.product_name}`,
+                 'Department Name: ' + `${element.department_name}`,
+                 'Price:'            + `${element.price}`,
+                 'Stock Quantity: '  + `${element.stock_quantity}`,
+                 'Product Sales: '  + `${element.product_sales}`,
 
+             ].join("\n");
+            console.log(products + "\n");  
+                // prompt user for product ID
+                idPrompt(res);  
+            });
     });
 }
 
 //Updates product quantity to the database
-function updateProductAmount(amount,stockQuantity, ID) {
+function  updateProduct(amount, stockQuantity, price, ID) {
     connection.query(`UPDATE  products
       SET stock_quantity = ?
-      WHERE item_id = ?`
-        , [stockQuantity-amount, ID],
+          product_sales  = ?
+          WHERE item_id = ?`
+        , [stockQuantity-amount, price*amount, ID],
         function (err, res) {           
             if (err) throw err;
             console.log(" ");
@@ -88,7 +102,7 @@ function purchaseAmountPrompt(res,ID) {
                 console.log("Sorry, we are out of stock.");
             }
             else {
-                   updateProductAmount(amount, res[ID-1].stock_quantity, ID);
+                   updateProduct(amount, res[ID-1].stock_quantity,res[ID-1].price, ID);
             }
         });
     ;
