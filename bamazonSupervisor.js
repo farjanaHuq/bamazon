@@ -27,6 +27,7 @@ connection.connect(function (err) {
 
 //Reads departments from the database
 function viewDepartments(){
+
     console.log("Displaying all departments...n");
     connection.query("SELECT * FROM departments", function (err, res) {
         if (err) 
@@ -38,10 +39,8 @@ function viewDepartments(){
                  'Department Id: '      + `${element.department_id}`,
                  'Department Name: '    + `${element.department_name}`,
                  'OverHead Costs:'      + `${element.over_head_costs}`,
-                //  'Product Sales'        + `${total_ProductSales}`,
-                //  'Total Profit'         + `${total_profit}`
              ].join("\n");
-            console.table(departments);  
+            console.table(departments + "\n");  
          });
         ;
         viewProductSalesbyDepartmentPrompt(res);
@@ -100,35 +99,27 @@ function viewProductSalesbyDepartmentPrompt(res) {
         ])
         .then(answers => {
             var ID = Number(answers.departmentID)-1;
+            var departmentName = res[ID].department_name;
+            var overHeadCosts  = res[ID].over_head_costs;
            // console.log(ID);
-
+           //console.log("Over head cost " + overHeadCosts);
+           
             connection.query(`SELECT product_sales FROM bamazon.products
             WHERE bamazon.products.department_name = ?
-            `, [res[ID].department_name], function (err, res) {
+            `, [res[ID].department_name], function (err, result) {
                     if (err) throw err;
-                    console.log(res);
-                    res.forEach(element => {
+                   // console.log(result);
+                    result.forEach(element => {
                         total_ProductSales += (element.product_sales);
                     });
                     console.log("Total product sale : " + total_ProductSales);
-
+                    total_profit = Math.abs(total_ProductSales - overHeadCosts);
+                    console.table(`Department Id | Department Name | OverHead Costs | Product Sales | Total Profit   
+                         ${ID}| ${departmentName}| ${overHeadCosts}| ${total_ProductSales} | ${total_profit} `);
+                   
                 });
 
-            ;
-            connection.query(`SELECT over_head_costs FROM bamazon.departments
-            WHERE bamazon.departments.department_name = ?
-            `, [res[ID].department_name], function (err, result) {
-                    if (err) throw err;
-                    console.log(result);
-                    var overHeadCosts = parseInt(result.over_head_costs);
-                    console.log("Over head cost " + overHeadCosts);
-                    total_profit = parseFloat(total_ProductSales - overHeadCosts);
-                    console.log(typeof total_profit);
-                    console.log("Total profit : " + total_profit);
-                    supervisorPrompt();
-                });
-            ;
-            
+            ;          
         });
 
     ;
