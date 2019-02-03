@@ -8,9 +8,9 @@ CREATE TABLE products (
     item_id INTEGER PRIMARY KEY AUTO_INCREMENT NOT NULL,
     product_name TEXT NOT NULL,
     department_name TEXT NOT NULL,
-    price DECIMAL(10 , 2 ) NOT NULL,
+    price DOUBLE(10 , 2 ) NOT NULL,
     stock_quantity INTEGER NOT NULL,
-    product_sales DOUBLE NOT NULL
+    product_sales DOUBLE(10 , 2 ) NOT NULL
 );
 
 INSERT INTO products(product_name, department_name, price, stock_quantity, product_sales) 
@@ -34,4 +34,6 @@ VALUES ("Bowl", "Kitchen Appliance", 9.99, 5674, 0.0);
 INSERT INTO products(product_name, department_name, price, stock_quantity, product_sales)
 VALUES ("Strainer", "Kitchen Appliance", 4.99, 6675, 0.0);
 
+SELECT SUM(products_sales)
+FROM products;
 

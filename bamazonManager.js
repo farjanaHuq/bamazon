@@ -1,6 +1,7 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
 
+//creating connection
 var connection = mysql.createConnection({
     host: "localhost",
     port: 3306,
@@ -85,7 +86,7 @@ function addNewProduct(product_name, department_name, price, stock_quantity){
             if (err) throw err;
                  
             console.log(" ");
-            managerPrompt();
+            manageMorePrompt();
         });
     ;    
 }
@@ -173,6 +174,11 @@ function managerPrompt() {
                 name: "info",
                 message: "Select your choice from below.",
                 choices: ["View Products for Sale", "View Low Inventory", "Add to Inventory", "Add New Product"]
+            },
+            {
+                type: "confrim",
+                message: "Do you wish to continue? (y/n)",
+                name: "choice"
             }
         ])
         .then(answers => {
@@ -190,12 +196,33 @@ function managerPrompt() {
             else if (answers.info === "Add New Product"){             
                     addNewProductPrompt();     
             }
-           else{
-               managerPrompt();
-               console.log("No option has been choosen.");
-           }
+            if(answers.choice){
+                managerPrompt();
+            }
 
         });
     ;
 }
+
+function manageMorePrompt() {
+    inquirer
+        .prompt([
+            {
+                type: "confrim",
+                message: "Do you wanna manage other departments? (y/n)",
+                name: "confirmManage"
+            }
+        ])
+        .then(answers => {
+            if(answers.confirmManage === 'y'){
+               managerPrompt();
+            }
+            else{
+                console.log("Finished supervising.");
+            }
+            
+        });
+    ;
+}
+
 
