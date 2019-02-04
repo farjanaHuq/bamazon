@@ -73,20 +73,21 @@ function addToInventory(amount, stockQuantity, id) {
 
 
 //add new products to the database
-function addNewProduct(product_name, department_name, price, stock_quantity){
+function addNewProduct(product_name, department_name, price, stock_quantity, product_sales){
    
-    console.log ("Add New Product.");
-    var sql = `INSERT INTO  products (product_name, department_name, price, stock_quantity) 
-                            VALUES (?,?, ?, ?)`;
+    //console.log ("Add New Product.");
+    var sql = `INSERT INTO  products (product_name, department_name, price, stock_quantity, product_sales) 
+                            VALUES (?, ?, ?, ?, ?)`;
 
     // var sql = `INSERT INTO  products (product_name, department_name, price, stock_quantity) 
     //                         VALUES ("knife", "kitchen Appliance", 12.99, 1234)`;
   
-    connection.query(sql, [product_name, department_name, price, stock_quantity], function (err, res) {
+    connection.query(sql, [product_name, department_name, price, stock_quantity, product_sales], function (err, res) {
             if (err) throw err;
                  
-            console.log(" ");
-            manageMorePrompt();
+            console.log("walla ");
+           managerPrompt();
+           manageMorePrompt();
         });
     ;    
 }
@@ -113,6 +114,7 @@ function addToInventoryPrompt(){
                 message: "How much would you like to add to your inventory? ",
                 name: "amount"
             },
+            
            
         ])
         .then(answers => {
@@ -156,10 +158,15 @@ function addNewProductPrompt(){
                 type: "input",
                 message: "Enter the stock quantity of the product.",
                 name: "stock_quantity"
-            }
+            },
+            {
+                type: "input",
+                message: "Enter the total product sales.",
+                name: "product_sales"
+            },
         ])
         .then(answers => {
-             addNewProduct(answers.product_name, answers.department_name, answers.price, answers.stock_quantity);
+             addNewProduct(answers.product_name, answers.department_name, answers.price, answers.stock_quantity, amount.product_sales);
              console.log("New item has been added.");
         });
     ;
@@ -174,12 +181,8 @@ function managerPrompt() {
                 name: "info",
                 message: "Select your choice from below.",
                 choices: ["View Products for Sale", "View Low Inventory", "Add to Inventory", "Add New Product"]
-            },
-            {
-                type: "confrim",
-                message: "Do you wish to continue? (y/n)",
-                name: "choice"
             }
+           
         ])
         .then(answers => {
            console.log(answers);
@@ -196,11 +199,8 @@ function managerPrompt() {
             else if (answers.info === "Add New Product"){             
                     addNewProductPrompt();     
             }
-            if(answers.choice){
-                managerPrompt();
-            }
-
         });
+       
     ;
 }
 

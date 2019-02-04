@@ -101,6 +101,8 @@ function viewProductSalesbyDepartmentPrompt(res) {
             var ID = Number(answers.departmentID)-1;
             var departmentName = res[ID].department_name;
             var overHeadCosts  = res[ID].over_head_costs;
+            var titleArr = ["Department_Id", "|", "Department_Name", "|" ,"Overhead Costs", "|","Product_Sales","|", "Total Profit"];
+            var dataArr = [`${ID}`,"|", `${departmentName}`,"|",`${overHeadCosts}`, "|",`${total_ProductSales}`, "|",`${total_profit} `];
            // console.log(ID);
            //console.log("Over head cost " + overHeadCosts);
            
@@ -114,9 +116,14 @@ function viewProductSalesbyDepartmentPrompt(res) {
                     });
                     console.log("Total product sale : " + total_ProductSales);
                     total_profit = Math.abs(total_ProductSales - overHeadCosts);
-                    console.table(`Department Id | Department Name | OverHead Costs | Product Sales | Total Profit   
-                         ${ID}| ${departmentName}| ${overHeadCosts}| ${total_ProductSales} | ${total_profit} `);
-                   
+                    console.table("Department Id | Department Name | OverHead Costs | Product Sales | Total Profit" ); 
+                    console.table  ( `${ID+1}    | ${departmentName} | ${overHeadCosts}|  ${total_ProductSales} | ${total_profit} `);
+                    // for(var i=0; i<titleArr.length; i++){
+                    //     for(var j=0; i<dataArr.length; j++){
+                    //     console.table(titleArr[i], "\n", dataArr[j]);
+                    //     }
+                    // }
+                   supervisorPrompt();
                 });
 
             ;          
@@ -124,6 +131,7 @@ function viewProductSalesbyDepartmentPrompt(res) {
 
     ;
 }
+//prompt to show supervisor the choices
 function supervisorPrompt() {
 
     inquirer
@@ -152,7 +160,7 @@ function supervisorPrompt() {
         });
     ;
 }
-
+//prompt to ask supervisor if he/she wants to continue.
 function superviseAgain() {
     inquirer
         .prompt([
